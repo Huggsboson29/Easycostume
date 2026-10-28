@@ -1,8 +1,9 @@
-# EasyCostume – Wizard Face AR
+# EasyCostume – Wizard Body AR
 
-Single-file WebAR demo (`index.html`) using A-Frame 1.5.0 + MindAR 1.2.5 face tracking.
-It uses the back camera by default (add `?cam=front` or tap "Switch camera" for the selfie camera) and puts a wizard hat (anchor 10), a white beard (anchor 152), a moustache and a
-rotating magic ring with sparkles on your face, using only A-Frame primitives.
+Single-file WebAR demo (`index.html`). It opens the phone's **back camera**, finds people with
+MediaPipe Pose Landmarker (body tracking, up to 3 people), and draws a wizard costume over them with
+A-Frame primitives: a pointy hat with a spinning magic ring at the tip, a white beard and moustache,
+a starry robe from the shoulders down, and sparkles on the right wrist.
 
 ## Live demo (GitHub Pages)
 
