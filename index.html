@@ -10,7 +10,11 @@
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-face-aframe.prod.js"></script>
 
   <style>
-    html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+    html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
+    /* Only <html> gets a background: MindAR puts the camera <video> at a negative z-index,
+       and a body background would paint over it (that caused a black screen). */
+    html { background: #000; }
+    body { background: transparent; }
     /* MindAR injects the <video> feed; force it (and the scene) to cover the screen */
     video { object-fit: cover; }
     .a-enter-vr, .a-enter-ar { display: none !important; }
@@ -19,6 +23,11 @@
       z-index: 10; padding: 8px 14px; border-radius: 999px;
       font: 14px/1.3 system-ui, sans-serif; color: #fff; background: rgba(40, 20, 80, 0.7);
       pointer-events: none; transition: opacity 0.4s;
+    }
+    #switch-cam {
+      position: fixed; top: 16px; right: 16px; z-index: 10;
+      padding: 10px 14px; border: 0; border-radius: 999px;
+      font: 14px system-ui, sans-serif; color: #fff; background: rgba(40, 20, 80, 0.7);
     }
   </style>
 
@@ -45,14 +54,15 @@
   </script>
 </head>
 <body>
-  <div id="hint">Look at the camera to become a wizard ✨</div>
+  <div id="hint">Point the camera at a face to make a wizard ✨</div>
+  <button id="switch-cam" type="button">Switch camera</button>
 
   <!--
-    mindar-face starts the front (selfie) camera and tracks 468 face landmarks.
+    mindar-face starts the camera (back by default, ?cam=front for selfie) and tracks 468 face landmarks.
     Units: roughly 1 unit ≈ face width, origin at each anchor landmark.
   -->
   <a-scene
-    mindar-face="autoStart: true; uiLoading: yes; uiError: yes; uiScanning: no"
+    mindar-face="autoStart: true; uiLoading: yes; uiError: yes; uiScanning: no; shouldFaceUser: false"
     embedded
     color-space="sRGB"
     renderer="colorManagement: true; physicallyCorrectLights: true; alpha: true"
@@ -156,6 +166,18 @@
   </a-scene>
 
   <script>
+    // Camera choice: back (environment) camera by default, ?cam=front for the selfie camera.
+    // This runs before A-Frame initialises the scene (it waits for DOMContentLoaded),
+    // so the attribute change is picked up when MindAR starts.
+    var useFront = new URLSearchParams(location.search).get('cam') === 'front';
+    document.querySelector('a-scene').setAttribute('mindar-face',
+      'autoStart: true; uiLoading: yes; uiError: yes; uiScanning: no; shouldFaceUser: ' + useFront);
+    document.getElementById('switch-cam').addEventListener('click', function () {
+      var url = new URL(location.href);
+      url.searchParams.set('cam', useFront ? 'back' : 'front');
+      location.replace(url);
+    });
+
     // Make the embedded scene fill the viewport and hide the hint once a face is found.
     var scene = document.querySelector('a-scene');
     var hint = document.getElementById('hint');
