@@ -4,6 +4,14 @@ Single-file WebAR demo (`index.html`) using A-Frame 1.5.0 + MindAR 1.2.5 face tr
 It puts a wizard hat (anchor 10), a white beard (anchor 152), a moustache and a
 rotating magic ring with sparkles on your face, using only A-Frame primitives.
 
+## Live demo (GitHub Pages)
+
+https://huggsboson29.github.io/Easycostume/
+
+GitHub Pages serves over HTTPS, so the camera works on phones too. To (re)enable it:
+**Settings → Pages → Build and deployment → Source: Deploy from a branch →
+Branch: `ccr-64c4cb79-mbjbjl` / `(root)` → Save.** (`.nojekyll` makes Pages serve the files as-is.)
+
 ## Run locally
 
 Browsers only allow camera access on `localhost` or HTTPS.
