@@ -1,9 +1,15 @@
 # EasyCostume – Wizard Body AR
 
 Single-file WebAR demo (`index.html`). It opens the phone's **back camera**, finds people with
-MediaPipe Pose Landmarker (body tracking, up to 3 people), and draws a wizard costume over them with
-A-Frame primitives: a pointy hat with a spinning magic ring at the tip, a white beard and moustache,
-a starry robe from the shoulders down, and sparkles on the right wrist.
+MediaPipe Pose Landmarker (body tracking, up to 3 people), and dresses each person in the textured
+wizard model from `wizard_costume.glb`:
+
+- **Costume** mesh (robe, sleeves, beard) – scaled to the shoulders, stretched so the beard lands on the chin.
+  Geometry above the moustache is trimmed off at load so the person's real face shows.
+- **Hat** mesh – sized to the head and placed on the forehead, with a spinning magic ring at the tip.
+- Sparkles on the right wrist.
+
+To fine-tune the fit, edit the `MODEL` constants near the top of the script in `index.html`.
 
 ## Live demo (GitHub Pages)
 

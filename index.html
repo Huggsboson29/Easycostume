@@ -69,82 +69,39 @@
   </a-scene>
 
   <!--
-    One costume. Parts are sized in body-relative units and placed every frame:
-      hat   – 1 unit = head width, origin on the forehead line
-      beard – 1 unit = head width, origin at the mouth
-      robe  – 1 unit = shoulder width, origin between the shoulders
-      wand  – sparkles on the right wrist
+    One costume per person. The GLB parts are attached from JS once the model has loaded:
+      body – the "Costume" mesh (robe, sleeves, beard), placed from the shoulders and mouth
+      hat  – the "Hat" mesh, placed on the head; the magic ring spins around its tip
+      wand – sparkles on the right wrist
+    Children of .hat are in the GLB's own units (metres-ish, hat tip at 0.43).
   -->
   <template id="costume-template">
     <a-entity class="costume">
-      <!-- ===== WIZARD HAT ===== -->
-      <a-entity class="hat">
-        <a-entity rotation="12 0 0">
-          <a-cylinder radius="0.8" height="0.04" color="#3b1f7a" material="roughness: 0.8"></a-cylinder>
-          <a-cylinder position="0 0.07 0" radius="0.47" height="0.1" open-ended="true"
-                      color="#f2c14e" material="metalness: 0.6; roughness: 0.3; side: double"></a-cylinder>
-          <a-cone position="0 0.65 0" height="1.3" radius-bottom="0.46" radius-top="0.02"
-                  color="#4a2bb3" material="roughness: 0.7"></a-cone>
-          <a-cone position="0.07 1.35 -0.03" rotation="0 0 -35" height="0.26"
-                  radius-bottom="0.06" radius-top="0.005" color="#4a2bb3"></a-cone>
-          <a-entity position="0.15 0.45 0.36" rotation="0 20 0">
-            <a-circle radius="0.05" segments="5" color="#ffe680" material="shader: flat; side: double"></a-circle>
-          </a-entity>
-          <a-entity position="-0.12 0.82 0.22" rotation="0 -20 0">
-            <a-circle radius="0.04" segments="5" color="#ffe680" material="shader: flat; side: double"></a-circle>
-          </a-entity>
+      <a-entity class="body"></a-entity>
 
-          <!-- Magic around the hat tip: glowing orb, rotating ring, orbiting sparkles -->
-          <a-entity position="0.15 1.44 -0.03">
-            <a-sphere radius="0.045" color="#bfe9ff"
-                      material="shader: flat; transparent: true; opacity: 0.9" twinkle="speed: 5"></a-sphere>
-            <a-entity rotation="70 0 10">
-              <a-entity spin="speed: 120">
-                <a-ring radius-inner="0.15" radius-outer="0.18" segments-theta="48" color="#9be7ff"
-                        material="shader: flat; transparent: true; opacity: 0.75; side: double"></a-ring>
-              </a-entity>
+      <a-entity class="hat">
+        <!-- Magic around the hat tip: glowing orb, rotating ring, orbiting sparkles -->
+        <a-entity position="-0.06 0.44 0.05" scale="0.25 0.25 0.25">
+          <a-sphere radius="0.045" color="#bfe9ff"
+                    material="shader: flat; transparent: true; opacity: 0.9" twinkle="speed: 5"></a-sphere>
+          <a-entity rotation="70 0 10">
+            <a-entity spin="speed: 120">
+              <a-ring radius-inner="0.15" radius-outer="0.18" segments-theta="48" color="#9be7ff"
+                      material="shader: flat; transparent: true; opacity: 0.75; side: double"></a-ring>
             </a-entity>
-            <a-entity spin="speed: -160">
-              <a-sphere position="0.23 0 0" radius="0.022" color="#ffffff"
-                        material="shader: flat; transparent: true" twinkle="speed: 6; offset: 0"></a-sphere>
-              <a-sphere position="-0.12 0.05 0.2" radius="0.018" color="#ffe680"
-                        material="shader: flat; transparent: true" twinkle="speed: 7; offset: 2"></a-sphere>
-              <a-sphere position="-0.12 -0.04 -0.2" radius="0.018" color="#d9a8ff"
-                        material="shader: flat; transparent: true" twinkle="speed: 5; offset: 4"></a-sphere>
-            </a-entity>
+          </a-entity>
+          <a-entity spin="speed: -160">
+            <a-sphere position="0.23 0 0" radius="0.022" color="#ffffff"
+                      material="shader: flat; transparent: true" twinkle="speed: 6; offset: 0"></a-sphere>
+            <a-sphere position="-0.12 0.05 0.2" radius="0.018" color="#ffe680"
+                      material="shader: flat; transparent: true" twinkle="speed: 7; offset: 2"></a-sphere>
+            <a-sphere position="-0.12 -0.04 -0.2" radius="0.018" color="#d9a8ff"
+                      material="shader: flat; transparent: true" twinkle="speed: 5; offset: 4"></a-sphere>
           </a-entity>
         </a-entity>
       </a-entity>
 
-      <!-- ===== BEARD + MOUSTACHE ===== -->
-      <a-entity class="beard">
-        <a-cone position="0 -0.55 0" rotation="180 0 0" height="0.95" radius-bottom="0.36" radius-top="0.03"
-                segments-radial="24" color="#f7f7f2" material="roughness: 1"></a-cone>
-        <a-sphere position="-0.24 -0.08 0" radius="0.17" scale="1 0.8 0.7" color="#f7f7f2" material="roughness: 1"></a-sphere>
-        <a-sphere position="0.24 -0.08 0" radius="0.17" scale="1 0.8 0.7" color="#f7f7f2" material="roughness: 1"></a-sphere>
-        <a-sphere position="0 -0.12 0.05" radius="0.24" scale="1.2 0.7 0.6" color="#f7f7f2" material="roughness: 1"></a-sphere>
-        <a-torus position="0.03 -1.04 0.02" rotation="0 90 0" radius="0.04" radius-tubular="0.016" arc="270"
-                 color="#f7f7f2"></a-torus>
-        <a-cone position="-0.13 0.04 0.08" rotation="0 0 -110" height="0.26" radius-bottom="0.055" radius-top="0.01"
-                color="#f7f7f2"></a-cone>
-        <a-cone position="0.13 0.04 0.08" rotation="0 0 110" height="0.26" radius-bottom="0.055" radius-top="0.01"
-                color="#f7f7f2"></a-cone>
-      </a-entity>
-
-      <!-- ===== ROBE: shoulders to below the hips ===== -->
-      <a-entity class="robe">
-        <a-cone position="0 -0.5 0" height="1" radius-top="0.52" radius-bottom="0.85" segments-radial="32"
-                color="#4a2bb3" material="roughness: 0.9; side: double"></a-cone>
-        <a-cylinder position="0 -1 0" radius="0.86" height="0.05" open-ended="true"
-                    color="#f2c14e" material="metalness: 0.6; roughness: 0.3; side: double"></a-cylinder>
-        <a-torus rotation="90 0 0" radius="0.5" radius-tubular="0.04"
-                 color="#f2c14e" material="metalness: 0.6; roughness: 0.3"></a-torus>
-        <a-entity position="0.25 -0.4 0.7"><a-circle radius="0.07" segments="5" color="#ffe680" material="shader: flat; side: double"></a-circle></a-entity>
-        <a-entity position="-0.3 -0.65 0.78"><a-circle radius="0.06" segments="5" color="#ffe680" material="shader: flat; side: double"></a-circle></a-entity>
-        <a-entity position="0.05 -0.85 0.82"><a-circle radius="0.05" segments="5" color="#ffe680" material="shader: flat; side: double"></a-circle></a-entity>
-      </a-entity>
-
-      <!-- ===== WAND SPARKLES on the right wrist ===== -->
+      <!-- Wand sparkles on the right wrist (1 unit = head width) -->
       <a-entity class="wand">
         <a-sphere radius="0.08" color="#bfe9ff" material="shader: flat; transparent: true" twinkle="speed: 6"></a-sphere>
         <a-entity spin="speed: 200">
@@ -163,13 +120,23 @@
     const DEPTH = 5;         // distance of the costume plane from the camera
     const FOV = 60;          // must match the camera fov in the scene
 
+    // Reference points measured on wizard_costume.glb (model units, figure faces +Z).
+    const MODEL = {
+      SHOULDER_Y: 0.16, SHOULDER_W: 0.26,   // shoulder joints on the robe
+      MOUTH_Y: 0.25,                        // just under the moustache
+      FACE_CUT_Y: 0.262,                    // robe/hood geometry above this is removed so the real face shows
+      HAT_CUT_Y: 0.272,                     // hair/hood under the hat brim is removed for the same reason
+      BRIM_X: -0.008, BRIM_Y: 0.285,        // centre of the hat brim
+      BRIM_W: 0.21                          // hat brim width
+    };
+
     const video = document.getElementById('cam');
     const status = document.getElementById('status');
     const scene = document.querySelector('a-scene');
 
     // MediaPipe pose landmark indices
     const L = { NOSE: 0, L_EAR: 7, R_EAR: 8, MOUTH_L: 9, MOUTH_R: 10,
-                L_SHOULDER: 11, R_SHOULDER: 12, R_WRIST: 16, L_HIP: 23, R_HIP: 24 };
+                L_SHOULDER: 11, R_SHOULDER: 12, R_WRIST: 16 };
 
     function say(text) { status.textContent = text; status.style.opacity = text ? '1' : '0'; }
 
@@ -201,6 +168,35 @@
       });
       try { return await PoseLandmarker.createFromOptions(fileset, options('GPU')); }
       catch (e) { return await PoseLandmarker.createFromOptions(fileset, options('CPU')); }
+    }
+
+    // ---------- Costume model ----------
+    // Keep only triangles with at least one vertex on the wanted side of y = cutY.
+    function cut(mesh, cutY, keepAbove) {
+      const g = mesh.geometry;
+      const y = g.attributes.position;
+      const src = g.index ? g.index.array : [...Array(y.count).keys()];
+      const keep = [];
+      for (let i = 0; i < src.length; i += 3) {
+        const a = src[i], b = src[i + 1], c = src[i + 2];
+        const ok = (v) => keepAbove ? y.getY(v) >= cutY : y.getY(v) <= cutY;
+        if (ok(a) || ok(b) || ok(c)) keep.push(a, b, c);
+      }
+      g.setIndex(keep);
+    }
+
+    async function loadCostume() {
+      const gltf = await new Promise((resolve, reject) =>
+        new THREE.GLTFLoader().load('wizard_costume.glb', resolve, undefined, reject));
+      const body = gltf.scene.getObjectByName('Costume');
+      const hat = gltf.scene.getObjectByName('Hat');
+      body.traverse((o) => { if (o.isMesh) cut(o, MODEL.FACE_CUT_Y, false); });
+      hat.traverse((o) => { if (o.isMesh) cut(o, MODEL.HAT_CUT_Y, true); });
+      // Clones share geometry and textures, so extra people cost almost nothing.
+      for (const s of slots) {
+        s.part('body').setObject3D('mesh', body.clone());
+        s.part('hat').setObject3D('mesh', hat.clone());
+      }
     }
 
     // ---------- Costume entities, one per person ----------
@@ -238,6 +234,12 @@
       o.scale.set(sx, sy, sz);
     }
 
+    // Rotate a model-space offset by roll and scale it, giving the world-space offset.
+    function offset(mx, my, roll, sx, sy) {
+      const x = mx * sx, y = my * sy, c = Math.cos(roll), s = Math.sin(roll);
+      return { x: x * c - y * s, y: x * s + y * c };
+    }
+
     function dress(slot, lm) {
       const toWorld = makeMapper();
       const P = (i) => toWorld(lm[i]);
@@ -249,25 +251,27 @@
       const shoulderW = dist(lSh, rSh);
       const headW = Math.max(dist(lEar, rEar) * 1.15, shoulderW * 0.45);
 
-      // Head tilt from the ear line (the person's left ear appears on the right of a back-camera image).
+      // Tilt from the ear / shoulder lines (the person's left side shows on the right of a back-camera image).
       const headRoll = Math.atan2(lEar.y - rEar.y, lEar.x - rEar.x);
-      const up = { x: -Math.sin(headRoll), y: Math.cos(headRoll) };
-      const head = mid(lEar, rEar);
-
-      // Hat: brim on the forehead line, a bit above the ears.
-      place(slot.part('hat'), head.x + up.x * headW * 0.45, head.y + up.y * headW * 0.45, z, headRoll, headW);
-
-      // Beard: hangs from the mouth, pushed toward the camera so it stays in front of the robe.
-      const mouth = mid(P(L.MOUTH_L), P(L.MOUTH_R));
-      place(slot.part('beard'), mouth.x, mouth.y, z + headW * 0.7, headRoll, headW);
-
-      // Robe: shoulders to below the hips (default length if the hips are out of frame), flattened in depth.
-      const neck = mid(lSh, rSh);
       const bodyRoll = Math.atan2(lSh.y - rSh.y, lSh.x - rSh.x);
-      const torso = (vis(L.L_HIP) || vis(L.R_HIP)) ? dist(neck, mid(P(L.L_HIP), P(L.R_HIP))) : shoulderW * 1.5;
-      const robe = slot.part('robe');
-      robe.object3D.visible = vis(L.L_SHOULDER) && vis(L.R_SHOULDER);
-      place(robe, neck.x, neck.y, z, bodyRoll, shoulderW, torso * 1.35, shoulderW * 0.35);
+      const head = mid(lEar, rEar);
+      const neck = mid(lSh, rSh);
+      const mouth = mid(P(L.MOUTH_L), P(L.MOUTH_R));
+
+      // Robe: width from the shoulders; height stretched so the beard lands on the chin.
+      const sx = shoulderW / MODEL.SHOULDER_W;
+      const mouthAbove = (mouth.x - neck.x) * -Math.sin(bodyRoll) + (mouth.y - neck.y) * Math.cos(bodyRoll);
+      const sy = Math.min(Math.max(mouthAbove / (MODEL.MOUTH_Y - MODEL.SHOULDER_Y), sx * 0.9), sx * 1.25);
+      const b = offset(0, MODEL.SHOULDER_Y, bodyRoll, sx, sy);
+      const body = slot.part('body');
+      body.object3D.visible = vis(L.L_SHOULDER) && vis(L.R_SHOULDER);
+      place(body, neck.x - b.x, neck.y - b.y, z, bodyRoll, sx, sy, sx);
+
+      // Hat: brim a little wider than the head, sitting on the forehead line.
+      const sh = headW * 1.3 / MODEL.BRIM_W;
+      const up = { x: -Math.sin(headRoll), y: Math.cos(headRoll) };
+      const h = offset(MODEL.BRIM_X, MODEL.BRIM_Y, headRoll, sh, sh);
+      place(slot.part('hat'), head.x + up.x * headW * 0.3 - h.x, head.y + up.y * headW * 0.3 - h.y, z, headRoll, sh);
 
       // Wand sparkles on the right wrist.
       const wand = slot.part('wand');
@@ -314,10 +318,10 @@
         say('Back camera unavailable (' + (e.message || e.name) + '). Check camera permission and reload.');
         return;
       }
-      say('Loading body tracking…');
+      say('Loading costume and body tracking…');
       let landmarker;
-      try { landmarker = await createLandmarker(); }
-      catch (e) { say('Could not load body tracking: ' + (e.message || e)); return; }
+      try { [landmarker] = await Promise.all([createLandmarker(), loadCostume()]); }
+      catch (e) { say('Could not load: ' + (e.message || e)); return; }
       say('Point the camera at a person 🧙');
 
       let lastVideoTime = -1;
