@@ -5,8 +5,8 @@ MediaPipe Pose Landmarker (body tracking, up to 3 people), and dresses each pers
 wizard model from `wizard_costume.glb`:
 
 - **Costume** mesh (robe, sleeves) – scaled to the shoulder width and placed on the shoulders.
-- **Hat** + **Beard** meshes (the beard includes the hair and covers the face) – moved together as one head
-  piece, sized to the head and centred between the ears, with a spinning magic ring at the hat tip.
+- **Hat** mesh – sized to the head and centred between the ears, with a spinning magic ring at the tip.
+- **Beard** mesh – trimmed at load to the part below the mouth (so the real face shows) and hung from the mouth.
 - Sparkles on the right wrist.
 
 To fine-tune the fit, edit the `MODEL` constants near the top of the script in `index.html`.
