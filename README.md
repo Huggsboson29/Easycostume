@@ -4,12 +4,13 @@ Single-file WebAR demo (`index.html`). It opens the phone's **back camera**, fin
 MediaPipe Pose Landmarker (body tracking, up to 3 people), and dresses each person in the textured
 wizard model from `wizard_costume.glb`:
 
-- **Costume** mesh (robe, sleeves, beard) – scaled to the shoulders, stretched so the beard lands on the chin.
-  Geometry above the moustache is trimmed off at load so the person's real face shows.
-- **Hat** mesh – sized to the head and placed on the forehead, with a spinning magic ring at the tip.
+- **Costume** mesh (robe, sleeves) – scaled to the shoulder width and placed on the shoulders.
+- **Hat** + **Beard** meshes (the beard includes the hair and covers the face) – moved together as one head
+  piece, sized to the head and centred between the ears, with a spinning magic ring at the hat tip.
 - Sparkles on the right wrist.
 
 To fine-tune the fit, edit the `MODEL` constants near the top of the script in `index.html`.
+Textures were downsized at import (costume 2048², the rest 1024²) so the model fits in phone GPU memory.
 
 ## Live demo (GitHub Pages)
 

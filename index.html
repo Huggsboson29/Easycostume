@@ -70,18 +70,20 @@
 
   <!--
     One costume per person. The GLB parts are attached from JS once the model has loaded:
-      body – the "Costume" mesh (robe, sleeves, beard), placed from the shoulders and mouth
-      hat  – the "Hat" mesh, placed on the head; the magic ring spins around its tip
-      wand – sparkles on the right wrist
-    Children of .hat are in the GLB's own units (metres-ish, hat tip at 0.43).
+      body  – the "Costume" mesh (robe and sleeves), placed from the shoulders
+      beard – the "Beard" mesh (hair + beard, covers the face) } placed together on the head,
+      hat   – the "Hat" mesh; the magic ring spins around its tip } keeping the model's own fit
+      wand  – sparkles on the right wrist
+    Children of .hat are in the GLB's own units (metres, feet at y = 0, hat tip at y = 1.8).
   -->
   <template id="costume-template">
     <a-entity class="costume">
       <a-entity class="body"></a-entity>
+      <a-entity class="beard"></a-entity>
 
       <a-entity class="hat">
         <!-- Magic around the hat tip: glowing orb, rotating ring, orbiting sparkles -->
-        <a-entity position="-0.06 0.44 0.05" scale="0.25 0.25 0.25">
+        <a-entity position="-0.09 1.81 0.08" scale="0.4 0.4 0.4">
           <a-sphere radius="0.045" color="#bfe9ff"
                     material="shader: flat; transparent: true; opacity: 0.9" twinkle="speed: 5"></a-sphere>
           <a-entity rotation="70 0 10">
@@ -120,14 +122,11 @@
     const DEPTH = 5;         // distance of the costume plane from the camera
     const FOV = 60;          // must match the camera fov in the scene
 
-    // Reference points measured on wizard_costume.glb (model units, figure faces +Z).
+    // Reference points measured on wizard_costume.glb (metres, figure faces +Z).
     const MODEL = {
-      SHOULDER_Y: 0.16, SHOULDER_W: 0.26,   // shoulder joints on the robe
-      MOUTH_Y: 0.25,                        // just under the moustache
-      FACE_CUT_Y: 0.262,                    // robe/hood geometry above this is removed so the real face shows
-      HAT_CUT_Y: 0.272,                     // hair/hood under the hat brim is removed for the same reason
-      BRIM_X: -0.008, BRIM_Y: 0.285,        // centre of the hat brim
-      BRIM_W: 0.21                          // hat brim width
+      SHOULDER_Y: 1.22, SHOULDER_W: 0.38,   // shoulder joints on the robe
+      HEAD_X: 0.004, HEAD_Y: 1.38,          // middle of the head between the ears (inside the hair/beard)
+      HEAD_W: 0.2                           // width of the hair/beard around the face
     };
 
     const video = document.getElementById('cam');
@@ -135,8 +134,7 @@
     const scene = document.querySelector('a-scene');
 
     // MediaPipe pose landmark indices
-    const L = { NOSE: 0, L_EAR: 7, R_EAR: 8, MOUTH_L: 9, MOUTH_R: 10,
-                L_SHOULDER: 11, R_SHOULDER: 12, R_WRIST: 16 };
+    const L = { NOSE: 0, L_EAR: 7, R_EAR: 8, L_SHOULDER: 11, R_SHOULDER: 12, R_WRIST: 16 };
 
     function say(text) { status.textContent = text; status.style.opacity = text ? '1' : '0'; }
 
@@ -171,31 +169,15 @@
     }
 
     // ---------- Costume model ----------
-    // Keep only triangles with at least one vertex on the wanted side of y = cutY.
-    function cut(mesh, cutY, keepAbove) {
-      const g = mesh.geometry;
-      const y = g.attributes.position;
-      const src = g.index ? g.index.array : [...Array(y.count).keys()];
-      const keep = [];
-      for (let i = 0; i < src.length; i += 3) {
-        const a = src[i], b = src[i + 1], c = src[i + 2];
-        const ok = (v) => keepAbove ? y.getY(v) >= cutY : y.getY(v) <= cutY;
-        if (ok(a) || ok(b) || ok(c)) keep.push(a, b, c);
-      }
-      g.setIndex(keep);
-    }
-
     async function loadCostume() {
       const gltf = await new Promise((resolve, reject) =>
         new THREE.GLTFLoader().load('wizard_costume.glb', resolve, undefined, reject));
-      const body = gltf.scene.getObjectByName('Costume');
-      const hat = gltf.scene.getObjectByName('Hat');
-      body.traverse((o) => { if (o.isMesh) cut(o, MODEL.FACE_CUT_Y, false); });
-      hat.traverse((o) => { if (o.isMesh) cut(o, MODEL.HAT_CUT_Y, true); });
+      const parts = { body: 'Costume', beard: 'Beard', hat: 'Hat' };
       // Clones share geometry and textures, so extra people cost almost nothing.
       for (const s of slots) {
-        s.part('body').setObject3D('mesh', body.clone());
-        s.part('hat').setObject3D('mesh', hat.clone());
+        for (const [cls, name] of Object.entries(parts)) {
+          s.part(cls).setObject3D('mesh', gltf.scene.getObjectByName(name).clone());
+        }
       }
     }
 
@@ -256,22 +238,21 @@
       const bodyRoll = Math.atan2(lSh.y - rSh.y, lSh.x - rSh.x);
       const head = mid(lEar, rEar);
       const neck = mid(lSh, rSh);
-      const mouth = mid(P(L.MOUTH_L), P(L.MOUTH_R));
 
-      // Robe: width from the shoulders; height stretched so the beard lands on the chin.
-      const sx = shoulderW / MODEL.SHOULDER_W;
-      const mouthAbove = (mouth.x - neck.x) * -Math.sin(bodyRoll) + (mouth.y - neck.y) * Math.cos(bodyRoll);
-      const sy = Math.min(Math.max(mouthAbove / (MODEL.MOUTH_Y - MODEL.SHOULDER_Y), sx * 0.9), sx * 1.25);
-      const b = offset(0, MODEL.SHOULDER_Y, bodyRoll, sx, sy);
+      // Robe: scaled to the shoulders, shoulder joints on the person's shoulders.
+      const sb = shoulderW / MODEL.SHOULDER_W;
+      const b = offset(0, MODEL.SHOULDER_Y, bodyRoll, sb, sb);
       const body = slot.part('body');
       body.object3D.visible = vis(L.L_SHOULDER) && vis(L.R_SHOULDER);
-      place(body, neck.x - b.x, neck.y - b.y, z, bodyRoll, sx, sy, sx);
+      place(body, neck.x - b.x, neck.y - b.y, z, bodyRoll, sb);
 
-      // Hat: brim a little wider than the head, sitting on the forehead line.
-      const sh = headW * 1.3 / MODEL.BRIM_W;
-      const up = { x: -Math.sin(headRoll), y: Math.cos(headRoll) };
-      const h = offset(MODEL.BRIM_X, MODEL.BRIM_Y, headRoll, sh, sh);
-      place(slot.part('hat'), head.x + up.x * headW * 0.3 - h.x, head.y + up.y * headW * 0.3 - h.y, z, headRoll, sh);
+      // Hat + beard: one head piece, a little wider than the head, centred between the ears,
+      // pushed toward the camera so the beard stays in front of the robe.
+      const sh = headW * 1.1 / MODEL.HEAD_W;
+      const h = offset(MODEL.HEAD_X, MODEL.HEAD_Y, headRoll, sh, sh);
+      for (const part of ['hat', 'beard']) {
+        place(slot.part(part), head.x - h.x, head.y - h.y, z + headW * 0.7, headRoll, sh);
+      }
 
       // Wand sparkles on the right wrist.
       const wand = slot.part('wand');
